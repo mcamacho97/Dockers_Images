@@ -1,0 +1,19 @@
+FROM python:slim
+
+RUN apt update && apt upgrade -y
+RUN apt install curl golang-go -y
+RUN go install github.com/benammann/git-secrets@latest
+RUN pip install -U checkov
+
+ENTRYPOINT ["checkov"]
+
+
+
+
+
+
+
+
+
+
+
