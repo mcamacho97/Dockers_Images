@@ -1,0 +1,9 @@
+FROM amazonlinux:latest
+RUN yum makecache
+RUN yum install -y wget yum-utils tar make python pip unzip
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+RUN yum -y install terraform
+RUN pip install checkov

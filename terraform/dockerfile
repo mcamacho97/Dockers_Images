@@ -1,18 +1,14 @@
-FROM alpine:latest
+FROM public.ecr.aws/codebuild/amazonlinux-x86_64-lambda-standard:python3.11
 
 ENV TERRAFORM_VERSION=1.7.5
 ENV TF_DEV=true
 ENV TF_RELEASE=true
 
-RUN apk add --update git bash openssh aws-cli
+RUN yum install -y yum-utils shadow-utils
+RUN yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+RUN yum -y install terraform
 
-WORKDIR $GOPATH/src/github.com/hashicorp/terraform
-RUN git clone https://github.com/hashicorp/terraform.git ./ && \
-    git checkout v${TERRAFORM_VERSION} && \
-    /bin/bash scripts/build.sh
 
-WORKDIR $GOPATH
-ENTRYPOINT ["terraform"]
 
 
 
