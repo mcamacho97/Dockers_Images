@@ -1,12 +1,6 @@
-FROM python:slim
+FROM public.ecr.aws/codebuild/amazonlinux-x86_64-lambda-standard:python3.11
 
-RUN apt update && apt upgrade -y
-RUN apt install golang-go -y
-RUN go install github.com/benammann/git-secrets@latest
 RUN pip install -U checkov
-
-ENTRYPOINT ["checkov"]
-
 
 
 
