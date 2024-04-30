@@ -1,0 +1,31 @@
+FROM public.ecr.aws/codebuild/amazonlinux-x86_64-lambda-standard:nodejs20
+
+# Set environment
+ENV BASH_ENV="~/.bashrc"
+SHELL ["/bin/bash", "-c"]
+
+######### This commands are necessary when you have zscaler enabled ############
+RUN echo 'sslverify=false' >> /etc/yum.conf
+RUN echo 'sslverify=false' >> /etc/dnf/dnf.conf
+RUN echo insecure >> ~/.curlrc
+################################################################################
+RUN dnf update -y
+RUN dnf install dnf-plugins-core -y
+COPY hashicorp.repo /etc/yum.repos.d/
+RUN dnf -y install terraform 
+RUN npm install -g @aws-amplify/cli@12.10.0 --verbose
+RUN amplify --version
+RUN dnf -y install awscli
+
+
+CMD [ "amplify" ]
+
+
+
+
+
+
+
+
+
+
