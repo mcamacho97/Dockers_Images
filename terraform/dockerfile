@@ -2,40 +2,24 @@ FROM public.ecr.aws/docker/library/amazonlinux:latest
 
 # Set environment
 ENV NODE_VERSION=20.12.2
-ENV NVM_VERSION=0.37.0
-ENV NVM_DIR /usr/local/nvm # or ~/.nvm , depending
-ENV PYTHON_VERSION=3.11
+ENV NVM_VERSION=0.39.1
+ENV NVM_DIR=/root/.nvm
 ENV BASH_ENV="~/.bashrc"
 SHELL ["/bin/bash", "-c"]
 
-# This commands are necessary when you have zscaler enabled 
-RUN echo 'sslverify=false' >> /etc/yum.conf
-RUN echo 'sslverify=false' >> /etc/dnf/dnf.conf
-RUN echo insecure >> ~/.curlrc
+# Update system and install necessary utilities
+RUN yum -y update && \
+    yum install -y yum-utils shadow-utils tar unzip && \
+    yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo && \
+    yum -y install terraform
 
-# Install dependencies
-RUN yum -y update
-RUN yum install -y yum-utils shadow-utils
-RUN yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-RUN yum -y install terraform
+# Install NVM
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash && \
+    echo 'export NVM_DIR="/root/.nvm"' >> ~/.bashrc && \
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
 
-# Get NVM and Pyenv
-# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$NVM_VERSION/install.sh | bash
-# RUN curl --insecure -o- https://pyenv.run --insecure | bash
-
-# Install Python
-# RUN pyenv install $PYTHON_VERSION
-# RUN pyenv global $PYTHON_VERSION
-
-# Install Node
-RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.20.0/install.sh | bash \
-    && source ~/.bashrc \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
-
-# Install AWS Amplify
-RUN npm install -g @aws-amplify/cli --verbose
+# Install Node.js
+RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm use $NODE_VERSION && \
+    npm install -g @aws-amplify/cli --verbose
 
 ENTRYPOINT [ "bash" ]
